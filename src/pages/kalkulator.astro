@@ -1,0 +1,142 @@
+---
+import Docs from '../layouts/Docs.astro';
+import { subnetInfo } from '../lib/subnet.js';
+---
+
+<Docs
+  title="Kalkulator"
+  description="Kalkulator subnetting interaktif untuk menghitung network address, broadcast, subnet mask, dan jumlah host IPv4."
+>
+  <h1>Kalkulator Subnet</h1>
+  <p class="lead">
+    Masukkan satu alamat IPv4 dan nilai prefix. Hasil terisi otomatis saat
+    nilai diubah.
+  </p>
+
+  <form id="calc" novalidate>
+    <div class="calc-grid">
+      <div class="calc-field">
+        <label for="ip">Alamat IP</label>
+        <input id="ip" value="192.168.1.10" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="calc-field">
+        <label for="prefix">Prefix</label>
+        <input id="prefix" value="24" inputmode="numeric" autocomplete="off" />
+      </div>
+    </div>
+    <button type="submit">Hitung</button>
+  </form>
+
+  <p class="calc-error" id="error" hidden></p>
+
+  <section class="calc-result" id="result" aria-live="polite"></section>
+
+  <h2>Cara Membaca Hasil</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Istilah</th>
+        <th>Keterangan</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Network address</td><td>Alamat awal sebuah subnet, tidak dipakai sebagai host</td></tr>
+      <tr><td>Broadcast address</td><td>Alamat akhir subnet, dipakai untuk menyiarkan ke semua anggota</td></tr>
+      <tr><td>Jumlah host terpakai</td><td>Jumlah alamat dikurangi dua untuk network dan broadcast</td></tr>
+      <tr><td>Wildcard mask</td><td>Kebalikan dari subnet mask, dipakai pada aturan firewall</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Contoh Hasil</h2>
+  <p>
+    Masukkan <code>192.168.1.10</code> dengan prefix <code>26</code>.
+    Network address menjadi <code>192.168.1.0</code> dan broadcast menjadi
+    <code>192.168.1.63</code>. Host yang bisa dipakai 62 buah, yaitu
+    <code>192.168.1.1</code> sampai <code>192.168.1.62</code>.
+  </p>
+
+  <script>
+    import { subnetInfo, validate } from '../lib/subnet.js';
+
+    const form = document.getElementById('calc') as HTMLFormElement;
+    const ipInput = document.getElementById('ip') as HTMLInputElement;
+    const prefixInput = document.getElementById('prefix') as HTMLInputElement;
+    const errorEl = document.getElementById('error') as HTMLParagraphElement;
+    const resultEl = document.getElementById('result') as HTMLElement;
+
+    const group = (bin: string) => bin.replace(/(.{8})/g, '$1.').replace(/\.$/, '');
+
+    const rows = (info: Record<string, any>) => [
+      ['Alamat IP', `${info.ip}/${info.prefix}`],
+      ['Subnet mask', info.subnetMask],
+      ['Wildcard mask', info.wildcard],
+      ['Network address', `${info.network}/${info.prefix}`],
+      ['Broadcast address', info.broadcast],
+      ['Jumlah total alamat', info.total.toLocaleString('id-ID')],
+      ['Jumlah host terpakai', info.usable.toLocaleString('id-ID')],
+      ['Host pertama', info.firstHost],
+      ['Host terakhir', info.lastHost],
+      ['IP dalam biner', group(info.binary.ip)],
+      ['Mask dalam biner', group(info.binary.mask)],
+      ['Network dalam biner', group(info.binary.network)],
+    ];
+
+    const render = (info: Record<string, any>) => {
+      resultEl.innerHTML =
+        '<dl>' +
+        rows(info)
+          .map(
+            ([k, v]) =>
+              `<dt>${k}</dt><dd${k.includes('biner') ? ' class="bin"' : ''}>${v}</dd>`,
+          )
+          .join('') +
+        '</dl>';
+    };
+
+    const calculate = () => {
+      const ip = ipInput.value;
+      const prefix = prefixInput.value.trim();
+      const err = validate(ip, prefix);
+      if (err) {
+        errorEl.textContent = err;
+        errorEl.hidden = false;
+        resultEl.innerHTML = '';
+        return;
+      }
+      errorEl.hidden = true;
+      render(subnetInfo(ip.trim(), Number(prefix)));
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      calculate();
+    });
+    ipInput.addEventListener('input', calculate);
+    prefixInput.addEventListener('input', calculate);
+
+    calculate();
+  </script>
+</Docs>
+
+<style>
+  .bin {
+    word-break: break-all;
+  }
+</style>
+
+<style is:global>
+  button {
+    font-family: inherit;
+    font-size: 0.9375rem;
+    padding: 9px 16px;
+    border: 1px solid var(--accent);
+    border-radius: 4px;
+    background: var(--accent);
+    color: #ffffff;
+    cursor: pointer;
+  }
+
+  button:hover {
+    filter: brightness(1.1);
+  }
+</style>

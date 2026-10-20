@@ -1,0 +1,154 @@
+---
+import Docs from '../layouts/Docs.astro';
+---
+
+<Docs
+  title="Debian CLI"
+  description="Perintah dasar Linux Debian untuk navigasi direktori, manipulasi file, permission, user, dan sudo."
+>
+  <h1>Perintah Dasar Debian</h1>
+  <p class="lead">
+    Debian adalah sistem operasi berbasis kernel Linux. Hampir seluruh
+    konfigurasi jaringan pada distro ini dilakukan lewat perintah teks.
+  </p>
+
+  <h2>Perintah Dasar Terminal</h2>
+  <pre><code>pwd                 direktori saat ini
+ls                  isi direktori
+ls -la              isi direktori termasuk yang tersembunyi
+cd /etc             pindah direktori
+cd ..               naik satu level
+mkdir jaringan      buat direktori
+touch berkas.txt    buat berkas kosong
+cp berkas salinan   salin berkas
+mv berkas lama      pindahkan atau ganti nama
+rm berkas           hapus berkas
+rm -r direktori     hapus direktori beserta isinya
+cat berkas          tampilkan isi berkas
+less berkas         tampilkan isi berkas per halaman
+nano berkas         edit berkas dengan editor teks</code></pre>
+
+  <h2>Navigasi Praktis</h2>
+  <pre><code>cd /
+ls
+cd home
+cd /var/log
+pwd
+df -h
+lsblk</code></pre>
+  <p>
+    Perintah <code>cd -</code> mengembalikan ke direktori sebelumnya. Perintah
+    <code>pwd</code> selalu menampilkan posisi saat ini.
+  </p>
+
+  <h2>Mencari Berkas</h2>
+  <pre><code>find /etc -name "*.conf"
+find /etc -type f -name "resolv.conf"
+grep -r "address" /etc/network
+which ip
+whereis ip</code></pre>
+  <p>
+    <code>find</code> mencari berdasarkan nama berkas. <code>grep</code>
+    mencari berdasarkan isi teks. <code>which</code> mencari lokasi sebuah
+    perintah.
+  </p>
+
+  <h2>Permission dan Ownership</h2>
+  <p>
+    Setiap berkas punya pemilik, grup, dan permission untuk pemilik, grup, serta
+    lainnya.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Angka</th>
+        <th>Izin</th>
+        <th>Keterangan</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>4</td><td>r</td><td>baca isi berkas</td></tr>
+      <tr><td>2</td><td>w</td><td>ubah isi berkas</td></tr>
+      <tr><td>1</td><td>x</td><td>jalankan berkas</td></tr>
+    </tbody>
+  </table>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Izin</th>
+        <th>Pemilik</th>
+        <th>Grup</th>
+        <th>Lainnya</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>rw-</td><td>baca tulis</td><td>baca tulis</td><td>hanya baca</td></tr>
+      <tr><td>r-x</td><td>baca dan jalankan</td><td>baca dan jalankan</td><td>baca dan jalankan</td></tr>
+      <tr><td>rwx</td><td>baca tulis jalankan</td><td>baca tulis jalankan</td><td>baca tulis jalankan</td></tr>
+    </tbody>
+  </table>
+
+  <pre><code>ls -l resolv.conf
+chmod 644 berkas.txt
+chmod 700 skrip.sh
+chown admin:jaringan berkas.txt
+chown admin berkas.txt
+chgrp jaringan berkas.txt</code></pre>
+
+  <h2>User dan Group</h2>
+  <pre><code>whoami
+id
+sudo useradd -m -s /bin/bash admin
+sudo passwd admin
+sudo usermod -aG sudo admin
+groups admin
+su - admin
+sudo whoami</code></pre>
+  <p>
+    Opsi <code>-m</code> membuat direktori home untuk user baru. Menambahkan
+    user ke group <code>sudo</code> diperlukan agar ia dapat memakai
+    <code>sudo</code>. Perubahan group baru berlaku setelah user keluar dan
+    masuk lagi.
+  </p>
+
+  <h2>Operasi Paket</h2>
+  <pre><code>sudo apt update
+sudo apt install net-tools iproute2
+sudo apt upgrade
+apt search openssh
+apt show openssh-server
+sudo apt remove nama-paket
+dpkg -l | grep ssh
+dpkg -L openssh-client</code></pre>
+  <p>
+    Semua perintah konfigurasi jaringan pada halaman berikutnya memakai
+    paket <code>iproute2</code> yang memuat perintah <code>ip</code>.
+  </p>
+
+  <h2>Service dan Log</h2>
+  <pre><code>systemctl status networking
+systemctl restart networking
+systemctl is-enabled ssh
+journalctl -u ssh --no-pager
+journalctl -f</code></pre>
+  <p>
+    <code>journalctl</code> membaca log sistem. Opsi <code>-f</code>
+    menampilkan log secara langsung saat kejadian baru masuk.
+  </p>
+
+  <h2>Arsip dan Transfer</h2>
+  <pre><code>tar -czvJ arsip.tar.xz /etc/network
+tar -xzvf arsip.tar.xz
+scp berkas.txt admin@192.168.1.10:/tmp/
+scp admin@192.168.1.10:/tmp/berkas.txt .
+rsync -av /etc/network/ backup/</code></pre>
+
+  <h2>Lanjut ke Konfigurasi Jaringan</h2>
+  <p>
+    Seluruh perintah di atas dapat langsung dicoba di terminal Debian.
+    Langkah berikutnya adalah menerapkan konfigurasi jaringan pada
+    <a href="/debian-jaringan">halaman Debian Jaringan</a>.
+  </p>
+</Docs>

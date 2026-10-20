@@ -1,0 +1,21 @@
+---
+import { PAGES } from '../nav.js';
+
+const current = Astro.url.pathname.replace(/\/+$/, '');
+const slug = current === '' ? '' : current.slice(1);
+---
+
+<nav aria-label="Navigasi utama">
+  <ul>
+    {
+      PAGES.map((p) => (
+        <li>
+          <a href={`/${p.slug}`} class={p.slug === slug ? 'active' : ''}>
+            {p.title}
+            <small>{p.desc}</small>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

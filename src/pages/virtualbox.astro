@@ -1,0 +1,116 @@
+---
+import Docs from '../layouts/Docs.astro';
+---
+
+<Docs
+  title="VirtualBox"
+  description="Membuat mesin virtual Debian di VirtualBox, konfigurasi sumber daya, dan memilih mode jaringan adapter."
+>
+  <h1>VirtualBox</h1>
+  <p class="lead">
+    VirtualBox dipakai untuk membuat lab jaringan tanpa merusak sistem host.
+    Beberapa mesin virtual dapat saling terhubung lewat adapter yang sama.
+  </p>
+
+  <h2>Yang Perlu Disiapkan</h2>
+  <ul>
+    <li>VirtualBox 7 atau lebih baru.</li>
+    <li>File ISO Debian 12, unduh dari mirror resmi Debian.</li>
+    <li>Alamat untuk hampir semua mesin.</li>
+    <li>Pengirtualisasi perangkat keras aktif di BIOS.</li>
+  </ul>
+
+  <h2>Membuat Mesin Virtual</h2>
+  <ol class="steps">
+    <li>Klik Machine, lalu New.</li>
+    <li>Isi Name dengan nama mesin, misalnya debian-server.</li>
+    <li>Pilih Type Linux dan Version Debian (64-bit).</li>
+    <li>Uncheck pada Creates a virtual hard disk now.</li>
+    <li>Klik Next untuk mengatur memori dan disk.</li>
+    <li>Isi memory size 2048 MB untuk satu mesin.</li>
+    <li>Pilih Create a new hard disk, tipe VDI, dan format Dynamically allocated.</li>
+    <li>Tentukan ukuran disk 20 GB, lalu Finish.</li>
+  </ol>
+  <p>
+    Buat dua mesin dengan langkah yang sama. Dua mesin diperlukan untuk menguji
+    komunikasi antar host pada jaringan yang sama.
+  </p>
+
+  <h2>Pasang ISO Debian</h2>
+  <ol class="steps">
+    <li>Pilih mesin, lalu klik ikon Storage pada toolbar.</li>
+    <li>Pilih empty pada Controller IDE.</li>
+    <li>Klik ikon disk di kanan, lalu Choose a disk file.</li>
+    <li>Pilih file ISO Debian yang sudah diunduh.</li>
+    <li>Klik OK, lalu jalankan mesin dengan tombol Start.</li>
+  </ol>
+  <p>
+    Lepas ISO setelah instalasi selesai agar mesin tidak mencoba boot dari
+    media install lagi.
+  </p>
+
+  <h2>Mode Jaringan Adapter</h2>
+  <p>
+    Buka Settings, pilih Network, lalu atur Adapter 1. Nama mode akan muncul
+    di kolom Attached to.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Mode</th>
+        <th>Cara Kerja</th>
+        <th>Cocok Untuk</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>NAT</td><td>Alamat diubah oleh translator di host</td><td>Akses internet tanpa jaringan lain</td></tr>
+      <tr><td>Bridged</td><td>Langsung masuk ke jaringan fisik</td><td>Komunikasi antar mesin virtual</td></tr>
+      <tr><td>Host only</td><td>Hanya terhubung ke host dan antar mesin virtual</td><td>Lab lokal tanpa akses internet</td></tr>
+      <tr><td>Internal Network</td><td>Terhubung antar mesin virtual tanpa host</td><td>Lab yang terisolasi penuh</td></tr>
+      <tr><td>Disconnected</td><td>Adapter dimatikan</td><td>Mematikan jaringan sementara</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <p>
+      Untuk menguji dua mesin Debian saling ping, gunakan mode Bridged pada
+      keduanya dan pilih nama interface fisik yang sama. Mode NAT membuat
+      tiap mesin berada di jaringan terpisah sehingga keduanya tidak dapat
+      saling terhubung secara langsung.
+    </p>
+  </div>
+
+  <h2>Adapter Kedua</h2>
+  <p>
+    Untuk simulasi jaringan dengan dua segmen, tambahkan Adapter 2 dan
+    beri mode berbeda. Satu adapter untuk jaringan lab, satu lagi untuk
+    akses internet.
+  </p>
+  <ol class="steps">
+    <li>Buka Settings, pilih Network.</li>
+    <li>Klik tab Adapter 2 dan aktifkan Enable Network Adapter.</li>
+    <li>Pilih mode sesuai kebutuhan segmen kedua.</li>
+    <li>Ulangi pada mesin kedua dengan urutan mode yang sama.</li>
+  </ol>
+
+  <h2>Snapshot</h2>
+  <p>
+    Snapshot menyimpan keadaan mesin pada satu titik. Ambil snapshot sebelum
+    melakukan perubahan besar agar mudah dikembalikan.
+  </p>
+  <ol class="steps">
+    <li>Pastikan mesin dalam keadaan mati atau pause.</li>
+    <li>Klik Machine, lalu Snapshots.</li>
+    <li>Klik Take Snapshot dan beri nama, misalnya sebelum-subnetting.</li>
+    <li>Pulihkan dengan memilih snapshot lalu Restore Snapshot.</li>
+  </ol>
+
+  <h2>Bagian Terpisah</h2>
+  <p>
+    Pada VirtualBox 7, jaringan dapat diatur lewat Network Manager pada
+    Tools, lalu Virtual Networks. Lab yang disarankan untuk starter adalah
+    dua mesin dengan adapter Host only, karena tidak bergantung pada
+    jaringan wifi atau ethernet host.
+  </p>
+</Docs>

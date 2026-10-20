@@ -1,0 +1,97 @@
+---
+import Docs from '../layouts/Docs.astro';
+
+const topik = [
+  {
+    href: '/ipv4',
+    judul: 'IPv4',
+    isi: 'Struktur alamat 32 bit, pembagian network dan host, kelas A sampai E.',
+  },
+  {
+    href: '/subnetting',
+    judul: 'Subnetting',
+    isi: 'Membagi satu network besar menjadi beberapa subnet dengan prefix.',
+  },
+  {
+    href: '/virtualbox',
+    judul: 'VirtualBox',
+    isi: 'Membuat mesin virtual dan memilih mode jaringan yang tepat.',
+  },
+  {
+    href: '/debian-cli',
+    judul: 'Debian CLI',
+    isi: 'Perintah dasar Linux untuk administer server Debian.',
+  },
+  {
+    href: '/debian-jaringan',
+    judul: 'Debian Jaringan',
+    isi: 'Konfigurasi alamat IP, routing, DNS, dan SSH pada Debian.',
+  },
+  {
+    href: '/kalkulator',
+    judul: 'Kalkulator Subnet',
+    isi: 'Hitung network, broadcast, dan jumlah host dari satu alamat IP.',
+  },
+];
+---
+
+<Docs
+  title="Beranda"
+  description="Website pembelajaran IPv4, subnetting, VirtualBox, dan konfigurasi jaringan Linux Debian."
+>
+  <h1>Belajar Jaringan dari Dasar</h1>
+  <p class="lead">
+    Materi singkat tentang IPv4, subnetting, dan praktik jaringan pada Debian
+    di dalam VirtualBox. Setiap halaman berisi perintah yang dapat langsung
+    dijalankan.
+  </p>
+
+  <h2>Urutan Belajar</h2>
+  <p>
+    Kerjakan berurutan. Tiga halaman pertama adalah konsep, tiga berikutnya
+    adalah praktik.
+  </p>
+  <ol class="steps">
+    <li>Pahami alamat IP dan cara membacanya.</li>
+    <li>Pelajari subnetting agar bisa membagi jaringan sendiri.</li>
+    <li>Buat lab virtual dengan VirtualBox.</li>
+    <li>Kuasai perintah dasar Debian.</li>
+    <li>Terapkan konfigurasi jaringan di Debian.</li>
+    <li>Gunakan kalkulator untuk memeriksa hasil subnetting.</li>
+  </ol>
+
+  <h2>Daftar Materi</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Materi</th>
+        <th>Isi Pokok</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        topik.map((t) => (
+          <tr>
+            <td><a href={t.href}>{t.judul}</a></td>
+            <td>{t.isi}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+
+  <h2>Prasyarat</h2>
+  <ul>
+    <li>VirtualBox 7 atau lebih baru sudah terpasang.</li>
+    <li>File ISO Debian 12 sudah diunduh dari situs resmi Debian.</li>
+    <li>Spesifikasi komputer minimal 8 GB RAM agar dua mesin virtual jalan.</li>
+  </ul>
+
+  <h2>Alur Praktik Utama</h2>
+  <p>
+    Pada halaman VirtualBox, buat dua mesin Debian. Pasang adapter jaringan
+    dengan mode bridge pada keduanya. Setelah itu, pada halaman Debian
+    Jaringan, tiap mesin diberi alamat IP pada subnet yang berbeda, lalu
+    diuji dengan <code>ping</code>.
+  </p>
+</Docs>

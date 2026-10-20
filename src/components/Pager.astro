@@ -1,0 +1,25 @@
+---
+import { neighbors } from '../nav.js';
+
+const { prev, next } = neighbors(Astro.url.pathname);
+---
+
+{
+  (prev || next) && (
+    <nav class="pager" aria-label="Navigasi halaman">
+      {prev && (
+        <a href={`/${prev.slug}`}>
+          <span>Sebelumnya</span>
+          {prev.title}
+        </a>
+      )}
+      <div class="spacer" />
+      {next && (
+        <a href={`/${next.slug}`} class="next">
+          <span>Selanjutnya</span>
+          {next.title}
+        </a>
+      )}
+    </nav>
+  )
+}

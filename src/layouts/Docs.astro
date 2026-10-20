@@ -1,0 +1,41 @@
+---
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const path = Astro.url.pathname.replace(/\/+$/, '');
+const slug = path === '' ? '' : path.slice(1);
+import Sidebar from '../components/Sidebar.astro';
+import Pager from '../components/Pager.astro';
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} | Belajar Jaringan</title>
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <a href="/" class="brand">Belajar Jaringan</a>
+        <span class="brand-sub">IPv4, subnetting, dan lab Linux Debian</span>
+        <Sidebar />
+      </aside>
+      <main class="content">
+        <slot />
+        <Pager />
+        <footer>
+          Materi pembelajaran jaringan. Seluruh perintah dapat dijalankan pada
+          VirtualBox dengan Debian.
+        </footer>
+      </main>
+    </div>
+  </body>
+</html>

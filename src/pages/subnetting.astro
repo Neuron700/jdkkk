@@ -1,0 +1,140 @@
+---
+import Docs from '../layouts/Docs.astro';
+---
+
+<Docs
+  title="Subnetting"
+  description="Subnetting IPv4, prefix length, subnet mask, cara membagi network, dan latihan soal."
+>
+  <h1>Subnetting</h1>
+  <p class="lead">
+    Subnetting adalah proses membagi satu network menjadi beberapa jaringan
+    kecil agar alamat IP terpakai efisien dan tiap bagian terisolasi.
+  </p>
+
+  <h2>Subnet Mask</h2>
+  <p>
+    Subnet mask membedakan bagian network dengan bagian host. Bit 1 berarti
+    network, bit 0 berarti host.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Prefix</th>
+        <th>Subnet Mask</th>
+        <th>Jumlah Alamat</th>
+        <th>Host Pakai</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>/24</td><td>255.255.255.0</td><td>256</td><td>254</td></tr>
+      <tr><td>/25</td><td>255.255.255.128</td><td>128</td><td>126</td></tr>
+      <tr><td>/26</td><td>255.255.255.192</td><td>64</td><td>62</td></tr>
+      <tr><td>/27</td><td>255.255.255.224</td><td>32</td><td>30</td></tr>
+      <tr><td>/28</td><td>255.255.255.240</td><td>16</td><td>14</td></tr>
+      <tr><td>/29</td><td>255.255.255.248</td><td>8</td><td>6</td></tr>
+      <tr><td>/30</td><td>255.255.255.252</td><td>4</td><td>2</td></tr>
+      <tr><td>/31</td><td>255.255.255.254</td><td>2</td><td>0</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Dua alamat paling bawah tidak pernah dipakai, yaitu network address dan
+    broadcast address. Pada <code>/32</code> seluruh 32 bit adalah network
+    sehingga hanya satu alamat yang tersedia.
+  </p>
+
+  <h2>Membagi Network</h2>
+  <p>
+    Contoh membagi <code>192.168.1.0/24</code> menjadi dua subnet sama
+    besar. Perlu dua bit tambahan dari network asli, sehingga prefix
+    menjadi <code>/26</code>. Jumlah subnet adalah 2 pangkat dua bit
+    tambahan, yaitu <code>2^2 = 4</code>.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Subnet</th>
+        <th>Network Address</th>
+        <th>Broadcast</th>
+        <th>Rentang Host</th>
+        <th>Host</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>1</td><td>192.168.1.0/26</td><td>192.168.1.63</td><td>192.168.1.1 sampai 192.168.1.62</td><td>62</td></tr>
+      <tr><td>2</td><td>192.168.1.64/26</td><td>192.168.1.127</td><td>192.168.1.65 sampai 192.168.1.126</td><td>62</td></tr>
+      <tr><td>3</td><td>192.168.1.128/26</td><td>192.168.1.191</td><td>192.168.1.129 sampai 192.168.1.190</td><td>62</td></tr>
+      <tr><td>4</td><td>192.168.1.192/26</td><td>192.168.1.255</td><td>192.168.1.193 sampai 192.168.1.254</td><td>62</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Langkah Membagi</h2>
+  <ol class="steps">
+    <li>Tentukan network address dari alamat yang diberikan.</li>
+    <li>Tentukan jumlah host yang dibutuhkan agar subnet cukup besar.</li>
+    <li>Pilih prefix dari tabel yang jumlah hostnya paling dekat.</li>
+    <li>Tambah jumlah bit network sehingga total bit sama dengan 32.</li>
+    <li>Kalikan dua pangkat jumlah bit tambahan untuk jumlah subnet.</li>
+    <li>Tuliskan network address dan broadcast setiap subnet.</li>
+  </ol>
+
+  <h2>VLSM</h2>
+  <p>
+    VLSM atau Variable Length Subnet Mask membagi network dengan ukuran yang
+    berbeda sesuai kebutuhan tiap bagian. Metode ini lebih hemat karena
+    tidak memaksa semua subnet memakai prefix yang sama.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Jumlah Host</th>
+        <th>Prefix Dipakai</th>
+        <th>Host Tersedia</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>50</td><td>/26</td><td>62</td></tr>
+      <tr><td>25</td><td>/27</td><td>30</td></tr>
+      <tr><td>10</td><td>/28</td><td>14</td></tr>
+      <tr><td>2</td><td>/30</td><td>2</td></tr>
+    </tbody>
+  </table>
+<p>
+    Cara membagi dengan VLSM adalah urutkan dari subnet yang paling besar ke
+    yang paling kecil. Pastikan tiap network address berada di dalam blok
+    yang tersedia dan tidak saling tumpang tindih.
+  </p>
+
+  <h2>Latihan Soal</h2>
+
+  <h3>Soal 1</h3>
+  <p>Tentukan network address, broadcast, dan jumlah host untuk <code>10.20.30.40/26</code>.</p>
+  <p>Jawaban: network <code>10.20.30.0</code>, broadcast <code>10.20.30.63</code>, host tersedia 62.</p>
+
+  <h3>Soal 2</h3>
+  <p>Berapa jumlah subnet yang terbentuk dari <code>172.16.0.0/24</code> menjadi <code>/27</code>?</p>
+  <p>Jawaban: 2 pangkat 3 = 8 subnet, masing-masing 30 host.</p>
+
+  <h3>Soal 3</h3>
+  <p>Berapa prefix yang dibutuhkan untuk jaringan dengan 100 host?</p>
+  <p>Jawaban: <code>/25</code> karena 126 host tersedia, sedangkan <code>/26</code> hanya 62.</p>
+
+  <h3>Soal 4</h3>
+  <p>Jaringan <code>192.168.0.0/24</code> dibagi menjadi dua jaringan /
+24. Apakah itu mungkin?</p>
+  <p>Jawaban: tidak. Butuh dua bit tambahan sehingga prefix menjadi <code>/26</code>.</p>
+
+  <h2>Memeriksa di Debian</h2>
+  <p>
+    Setelah konfigurasi selesai, jumlah host yang tersedia dapat dicek dari
+    kernel Debian.
+  </p>
+  <pre><code>ip -br addr show enp0s3</code></pre>
+  <p>
+    Gunakan <a href="/kalkulator">Kalkulator</a> untuk memeriksa setiap
+    jawaban di atas tanpa menghitung manual.
+  </p>
+</Docs>

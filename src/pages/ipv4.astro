@@ -1,0 +1,157 @@
+---
+import Docs from '../layouts/Docs.astro';
+---
+
+<Docs
+  title="IPv4"
+  description="Struktur alamat IPv4 32 bit, pembagian network dan host, kelas A sampai E, serta alamat privat dan publik."
+>
+  <h1>IPv4</h1>
+  <p class="lead">
+    IPv4 adalah alamat logis sepanjang 32 bit yang dipakai protokol TCP/IP
+    untuk mengidentifikasi sebuah host dalam jaringan.
+  </p>
+
+  <h2>Struktur Alamat</h2>
+  <p>
+    Alamat IPv4 ditulis dalam bentuk desimal titik, misalnya
+    <code>192.168.1.10</code>. Nilainya dapat dikonversi ke bentuk biner.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Desimal</th>
+        <th>Binair</th>
+        <th>Jumlah Bit</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>192</td><td>11000000</td><td>8</td></tr>
+      <tr><td>168</td><td>10101000</td><td>8</td></tr>
+      <tr><td>1</td><td>00000001</td><td>8</td></tr>
+      <tr><td>10</td><td>00001010</td><td>8</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Empat oktet tersebut disusun menjadi satu bilangan 32 bit. Pada
+    <code>192.168.1.10</code> bentuk binernya adalah
+    <code>11000000.10101000.00000001.00001010</code>.
+  </p>
+
+  <h2>Network dan Host</h2>
+  <p>
+    Alamat IP terbagi atas dua bagian, yaitu bagian network dan bagian host.
+    Bagian network mengidentifikasi jaringan tersebut. Bagian host
+    mengidentifikasi komputer di dalam jaringan.
+  </p>
+  <p>
+    Pembagiannya ditentukan oleh <em>prefix length</em>, yaitu jumlah bit
+    awal yang dipakai sebagai network. Contoh prefix <code>/24</code>
+    artinya 24 bit pertama adalah network.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Alamat</th>
+        <th>Network</th>
+        <th>Host</th>
+        <th>Prefix</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>192.168.1.10</td><td>192.168.1</td><td>10</td><td>/24</td></tr>
+      <tr><td>192.168.1.10</td><td>192.168</td><td>1.10</td><td>/16</td></tr>
+      <tr><td>192.168.1.10</td><td>192</td><td>168.1.10</td><td>/8</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Alamat Khusus</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Kondisi</th>
+        <th>Nilai</th>
+        <th>Keterangan</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Network address</td><td>host bagian awal</td><td>Menandai jaringan, tidak dipakai sebagai host</td></tr>
+      <tr><td>Broadcast address</td><td>host bagian akhir</td><td>Menandai seluruh anggota jaringan</td></tr>
+      <tr><td>Loopback</td><td>127.0.0.1</td><td>Menguji komputer sendiri</td></tr>
+    </tbody>
+  </table>
+  <p>
+    Pada prefix <code>/24</code> untuk jaringan
+    <code>192.168.1.0/24</code>, network address adalah
+    <code>192.168.1.0</code> dan broadcast address adalah
+    <code>192.168.1.255</code>. Jadi hanya 254 dari 256 alamat yang bisa
+    dipakai.
+  </p>
+
+  <h2>Kelas Alamat</h2>
+  <p>
+    Sistem lama mengelompokkan alamat berdasarkan nilai bit pertama. Kelas
+    ini tidak dipakai lagi pada jaringan modern karena jumlah alamat IPv4
+    yang tersisa sangat sedikit.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Kelas</th>
+        <th>Bit Awal</th>
+        <th>Rentang Awal</th>
+        <th>Prefix Default</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>A</td><td>0</td><td>1.0.0.0 sampai 126.255.255.255</td><td>/8</td></tr>
+      <tr><td>B</td><td>10</td><td>128.0.0.0 sampai 191.255.255.255</td><td>/16</td></tr>
+      <tr><td>C</td><td>110</td><td>192.0.0.0 sampai 223.255.255.255</td><td>/24</td></tr>
+      <tr><td>D</td><td>1110</td><td>224.0.0.0 sampai 239.255.255.255</td><td>multicast</td></tr>
+      <tr><td>E</td><td>1111</td><td>240.0.0.0 sampai 255.255.255.255</td><td>dicadangkan</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    <p>
+      Kelas A sampai C bersifat single use, yaitu satu host satu alamat.
+      Kelas D dipakai untuk multicast dan kelas E dicadangkan untuk
+      keperluan penelitian.
+    </p>
+  </div>
+
+  <h2>Alamat Privat dan Publik</h2>
+  <p>
+    Alamat privat hanya berlaku di dalam jaringan lokal dan tidak dapat
+    dirutekan di internet. Untuk keluar ke internet, perangkat di belakang
+    router memakai Network Address Translation atau NAT.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Blok</th>
+        <th>Rentang</th>
+        <th>Prefix Umum</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Kelas A privat</td><td>10.0.0.0 sampai 10.255.255.255</td><td>/8</td></tr>
+      <tr><td>Kelas B privat</td><td>172.16.0.0 sampai 172.31.255.255</td><td>/16</td></tr>
+      <tr><td>Kelas C privat</td><td>192.168.0.0 sampai 192.168.255.255</td><td>/24</td></tr>
+      <tr><td>Loopback</td><td>127.0.0.0 sampai 127.255.255.255</td><td>/8</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Menukar Alamat ke Biner</h2>
+  <p>Perintah berikut mengubah satu oktet ke bentuk binernya.</p>
+  <pre><code>printf '%d = %08b\n' 192 192</code></pre>
+  <p>
+    Seluruh alamat dapat ditampilkan sekaligus oleh <code>ip -br addr</code>
+    pada mesin Debian. Lanjut ke halaman <a href="/subnetting">Subnetting</a>
+    untuk menghitung jumlah host yang tersedia.
+  </p>
+</Docs>

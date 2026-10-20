@@ -1,0 +1,182 @@
+---
+import Docs from '../layouts/Docs.astro';
+---
+
+<Docs
+  title="Debian Jaringan"
+  description="Konfigurasi alamat IP statis, routing, DNS, dan SSH pada Linux Debian untuk lab jaringan."
+>
+  <h1>Konfigurasi Jaringan Debian</h1>
+  <p class="lead">
+    Halaman ini berisi konfigurasi jaringan yang dijalankan di dalam mesin
+    virtual Debian hasil installers VirtualBox.
+  </p>
+
+  <h2>Mengenal Interface</h2>
+  <p>
+    Nama interface pada Linux bisa berupa <code>eth0</code>,
+    <code>enp0s3</code>, atau <code>ens18</code>. Selalu periksa nama yang
+    dipakai sistem, jangan menebak.
+  </p>
+  <pre><code>ip -br link
+ip -br addr
+ip link show</code></pre>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Perintah</th>
+        <th>Fungsi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>ip -br link</td><td>Daftar interface beserta status dan MAC address</td></tr>
+      <tr><td>ip -br addr</td><td>Daftar interface beserta alamat IP</td></tr>
+      <tr><td>ip route</td><td>Daftar tabel routing</td></tr>
+      <tr><td>ip neigh</td><td>Daftar tetangga pada ARP table</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Melihat Konfigurasi Lama</h2>
+  <p>
+    Debian menyimpan konfigurasi jaringan di bawah direktori
+    <code>/etc/network</code>.
+  </p>
+  <pre><code>ls /etc/network
+ls /etc/network/interfaces.d
+cat /etc/network/interfaces
+cat /etc/resolv.conf</code></pre>
+
+  <h2>Alamat IP Statis</h2>
+  <p>
+    Konfigurasi berikut memberi mesin satu alamat pada jaringan
+    <code>192.168.10.0/24</code> dengan gateway
+    <code>192.168.10.1</code>.
+  </p>
+  <pre><code>sudo nano /etc/network/interfaces
+
+auto enp0s3
+iface enp0s3 inet static
+    address 192.168.10.10
+    netmask 255.255.255.0
+    gateway 192.168.10.1</code></pre>
+
+  <p>Terapkan konfigurasi lalu periksa hasilnya.</p>
+  <pre><code>sudo systemctl restart networking
+ip -br addr show enp0s3
+ip route</code></pre>
+
+  <h2>Subnet Berbeda pada Dua Mesin</h2>
+  <p>
+    Agar dua mesin dapat saling berkomunikasi, keduanya harus berada pada
+    subnet yang sama dengan prefix yang sama.
+  </p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Mesin</th>
+        <th>Alamat</th>
+        <th>Prefix</th>
+        <th>Gateway</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>debian-a</td><td>192.168.10.10</td><td>/24</td><td>192.168.10.1</td></tr>
+      <tr><td>debian-b</td><td>192.168.10.20</td><td>/24</td><td>192.168.10.1</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Memisahkan Segmen dengan Dua Adapter</h2>
+  <p>
+    Untuk simulasi routing, satu mesin memakai dua adapter. Adapter pertama ke
+    LAN dengan mode Bridge, adapter kedua ke internet dengan mode NAT.
+  </p>
+  <pre><code>auto enp0s3
+iface enp0s3 inet static
+    address 192.168.10.10
+    netmask 255.255.255.0
+
+auto enp0s8
+iface enp0s8 inet dhcp</code></pre>
+  <p>
+    Prefix menjadi <code>/24</code> atau <code>/16</code> pada antarmuka
+    yang menuju internet. Perintah berikut memastikan IP kedua segment
+    terkirim ke interface yang benar.
+  </p>
+  <pre><code>sudo ip route add 192.168.10.0/24 dev enp0s3
+sudo ip route add default via 192.168.10.1 dev enp0s8</code></pre>
+  <p>
+    Agar permanen, tambahkan aturan tersebut ke
+    <code>/etc/network/interfaces</code> pada tiap interface atau pakai
+    berkas <code>/etc/network/if-up.d</code>.
+  </p>
+
+  <h2>Konfigurasi DNS</h2>
+  <p>
+    Debian 12 memakai <code>systemd-resolved</code>. Alokasi nama dapat diubah
+    lewat berkas <code>/etc/resolv.conf</code>.
+  </p>
+  <pre><code>sudo nano /etc/resolv.conf
+
+nameserver 192.168.10.1
+nameserver 1.1.1.1
+search jaringan.local</code></pre>
+  <pre><code>resolvectl status
+ping -c 4 debian.org
+ping -c 4 1.1.1.1</code></pre>
+
+  <div class="note">
+    <p>
+      Bedakan pengujian nama dan pengujian koneksi. Ping ke
+      <code>1.1.1.1</code> berhasil berarti routing berjalan. Ping ke
+      <code>debian.org</code> berhasil berarti DNS juga berjalan.
+    </p>
+  </div>
+
+  <h2>Menguji Koneksi</h2>
+  <pre><code>ping -c 4 192.168.10.20
+ping -c 4 8.8.8.8
+ip neigh show</code></pre>
+  <p>
+    <code>ip neigh</code> menampilkan entri ARP. Bila ping gagal tetapi
+    <code>ip neigh</code> menunjukkan
+    <code>FAILED</code>, berarti kedua mesin berada pada subnet berbeda.
+  </p>
+
+  <h2>Remote Login dengan SSH</h2>
+  <pre><code>sudo apt update
+sudo apt install openssh-server
+sudo systemctl enable --now ssh
+systemctl status ssh</code></pre>
+  <p>Lalu dari mesin lain.</p>
+  <pre><code>ssh admin@192.168.10.20
+scp berkas.txt admin@192.168.10.20:/home/admin/</code></pre>
+
+  <h2>Mematikan Firewall Sementara</h2>
+  <p>
+    Saat lab, firewall bawaan dapat menghalangi ping antar mesin.
+  </p>
+  <pre><code>sudo nft list ruleset
+sudo systemctl stop nftables
+sudo systemctl disable nftables</code></pre>
+  <p>
+    Untuk mengizinkan ping agar tetap aktif, tambahkan aturan pada
+    <code>/etc/nftables.conf</code>.
+  </p>
+  <pre><code>{'table inet filter {\n    chain input {\n        type filter hook input priority filter;\n        policy accept;\n    }\n    chain forward {\n        type filter hook forward priority filter;\n        policy accept;\n    }\n}'}</code></pre>
+
+  <h2>Riwayat Perubahan</h2>
+  <p>
+    Simpan konfigurasi sebelum diedit agar mudah dikembalikan.
+  </p>
+  <pre><code>sudo cp /etc/network/interfaces /etc/network/interfaces.bak
+sudo nano /etc/network/interfaces.bak</code></pre>
+
+  <h2>Rangkuman Perintah</h2>
+  <pre><code>ip -br addr
+ip route
+ping -c 4 192.168.10.20
+systemctl restart networking
+resolvectl status</code></pre>
+</Docs>
